@@ -15,8 +15,10 @@ MAIN_MENU() {
 CHECK_DATABASE() {
   CHECK_DATABASE_FOR_ARGUMENT=null
   CHECK_ATOMIC_NUMBER=$($PSQL "SELECT atomic_number FROM elements WHERE atomic_number=$1")
-  echo $CHECK_ATOMIC_NUMBER
+  echo "atomic number: $CHECK_ATOMIC_NUMBER"
   #if argument doesn't exist in database, print error message: I could not find that element in the database.
+  CHECK_SYMBOL=$($PSQL "SELECT symbol FROM elements WHERE symbol = '$1'")
+  echo "symbol: $CHECK_SYMBOL"
 }
 
 MAIN_MENU "$1"
