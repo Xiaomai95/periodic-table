@@ -13,12 +13,16 @@ MAIN_MENU() {
 }
 
 CHECK_DATABASE() {
-  GET_ATOMIC_NUMBER=$($PSQL "SELECT atomic_number FROM elements WHERE atomic_number=$1")
-  GET_SYMBOL=$($PSQL "SELECT symbol FROM elements WHERE symbol = '$1'")
-  GET_ELEMENT_NAME=$($PSQL "SELECT name FROM elements WHERE name = '$1'")
-  echo $GET_ATOMIC_NUMBER
-  echo $GET_SYMBOL
-  echo $GET_ELEMENT_NAME
+  if [[ "$1" =~ ^[0-9]$ ]] 
+    then 
+     GET_ATOMIC_NUMBER=$($PSQL "SELECT atomic_number FROM elements WHERE atomic_number=$1")
+  elif [[ "$1" =~ ^[A-Z][a-z]?$ ]] 
+    then
+    GET_SYMBOL=$($PSQL "SELECT symbol FROM elements WHERE symbol = '$1'")
+  elif [[ "$1" =~ ^[A-Z][a-z]*$ ]]
+    then
+     GET_ELEMENT_NAME=$($PSQL "SELECT name FROM elements WHERE name = '$1'")
+  fi
 
   #get rest of information
   #Use the info you got to get the rest of the info you need
@@ -42,7 +46,7 @@ CHECK_DATABASE() {
     elif [[ $GET_ELEMENT_NAME ]]
       then 
       GET_ATOMIC_NUMBER=$($PSQL "SELECT atomic_number FROM elements WHERE name = '$GET_ELEMENT_NAME'")
-      GET_SYMBOL=$($PSQL "SELECT symbol FROM elements INNER JOIN properties ON properties.atomic_number = elements.atomic_number WHERE elements.name = $GET_ELEMENT_NAME")
+      GET_SYMBOL=$($PSQL "SELECT symbol FROM elements INNER JOIN properties ON properties.atomic_number = elements.atomic_number WHERE elements.name = '$GET_ELEMENT_NAME'")
       GET_TYPE=$($PSQL "SELECT type FROM types INNER JOIN properties ON types.type_id = properties.type_id INNER JOIN elements ON elements.atomic_number = properties.atomic_number WHERE name = '$GET_ELEMENT_NAME'")
       GET_MASS=$($PSQL "SELECT atomic_mass FROM properties INNER JOIN elements ON properties.atomic_number = elements.atomic_number WHERE elements.name = '$GET_ELEMENT_NAME'")
       GET_BOILING_POINT=$($PSQL "SELECT boiling_point_celsius FROM properties INNER JOIN elements ON properties.atomic_number = elements.atomic_number WHERE elements.name = '$GET_ELEMENT_NAME'")
